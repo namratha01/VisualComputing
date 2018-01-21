@@ -8,7 +8,8 @@ numpyInput = cv2.imread(filename='./samples/noise.png', flags=cv2.IMREAD_COLOR).
 
 # use a median filter of size 3x3 to filter numpyInput and store the result in numpySecond
 
-
+numpyFirst = cv2.GaussianBlur(numpyInput,(3,3),0)
+numpySecond = cv2.medianBlur(numpyInput,3)
 
 
 
