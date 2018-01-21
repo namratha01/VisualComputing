@@ -9,7 +9,6 @@ numpyKernel = numpy.array([[-2, -1, 0], [-1, 1, 1], [0, 1, 2]], numpy.float32)
 
 # pad numpyKernel such that its resolution is equal to the resolution of numpyImage
 # roll it one pixel to the left and one pixel to the top in order to adjust the phase
-numpyKernelpadded = numpy.pad(numpyKernel,((254,255),(254,255)),'constant')
 numpyKernelpadded = numpy.pad(numpyKernel,[(0, numpyImage.shape[0] - 3),(0, numpyImage.shape[0] - 3)],'constant')
 numpyKernelpadded = numpy.roll(numpy.roll(numpyKernelpadded,-1,0),-1,1)
 
