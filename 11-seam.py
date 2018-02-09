@@ -15,7 +15,7 @@ numpyEnergy = numpy.abs(cv2.Sobel(src=cv2.cvtColor(src=numpyInput, code=cv2.COLO
 
 # find and remove one-hundred vertical seams, can potentially be slow
 
-def cumulative_map(energy_map):
+def cumulative_energy_map(energy_map):
 
         m, n = energy_map.shape
         output = numpy.copy(energy_map)
@@ -64,7 +64,7 @@ for intRemove in tqdm.tqdm(range(100)):
 	# a seam from the top left to the bottom right: intSeam = [0, 1, 2, 3, 4, ...]
 	# a seam that is just the first column: intSeam = [0, 0, 0, 0, 0, 0 , ...]
 
-	cumulative_map = cumulative_map(numpyEnergy)
+	cumulative_map = cumulative_energy_map(numpyEnergy)
 	intSeam = find_seam(cumulative_map)
 	# some sanity checks, such that the length of the seam is equal to the height of the image
 	# furthermore iterating over the seam and making sure that it is a connected sequence
