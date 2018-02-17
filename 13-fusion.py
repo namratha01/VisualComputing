@@ -17,9 +17,44 @@ numpyInputs = [
 
 numpyWeights = []
 
+def compute_weights(images):
+    (wc, ws, we) = (1, 1, 1)
+    sigma = 0.2
+    epsilon = 0.0000001
 
+    weights = []
+    weights_sum = numpy.zeros(images[0].shape[:2], dtype=numpy.float32)
+    for image_uint in images:
+        image = numpy.float32(image_uint)
+        W = numpy.ones(image.shape[:2], dtype=numpy.float32)
 
+        # contrast
+        image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        laplacian = cv2.Laplacian(image_gray, cv2.CV_32F)
+        W_contrast = numpy.absolute(laplacian) ** wc
+        W = numpy.multiply(W, W_contrast)
 
+        # saturation
+        W_saturation = image.std(axis=2, dtype=numpy.float32) ** ws
+        W = numpy.multiply(W, W_saturation)
+
+        # well-exposedness
+        sigma2 = sigma**2
+        W_exposedness = numpy.prod(numpy.exp(-((image - 0.5)**2)/(2*sigma2)), axis=2, dtype=numpy.float32) ** we
+        W = numpy.multiply(W, W_exposedness)
+	
+        W = W + epsilon
+        weights_sum = numpy.add(W,weights_sum)
+
+        weights.append(W)
+
+    # normalization
+    for i in range(len(weights)):
+        weights[i] = numpy.divide(weights[i],weights_sum)
+
+    return weights
+
+numpyWeights = compute_weights(numpyInputs)
 
 # creating the laplacian and gaussian pyramids to perform multiband blending
 # defining separate functions for this steps makes the code easier to read

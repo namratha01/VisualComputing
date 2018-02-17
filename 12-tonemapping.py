@@ -3,7 +3,6 @@ import cv2
 import os
 import zipfile
 import matplotlib.pyplot
-import math
 
 # this exercise references "Photographic Tone Reproduction for Digital Images" by Reinhard et al.
 
@@ -21,11 +20,11 @@ numpyIntensity = cv2.cvtColor(src=numpyRadiance, code=cv2.COLOR_BGR2GRAY) + 0.00
 # afterwards, apply the non-linear tone mapping prescribed by equation 3
 # finally obtain numpyOutput using the ad-hoc formula with s = 0.6 from the slides
 
-delta = 1
+delta = 0
 numpyLog = numpy.log(numpyIntensity + delta)
 numpyMean = numpy.mean(numpyLog)
 key = numpy.exp(numpyMean)
-
+print(key)
 a = 0.18
 normIntensity = numpy.divide(numpyIntensity,(a/key))
 nlToneMap = normIntensity / (normIntensity + 1)
