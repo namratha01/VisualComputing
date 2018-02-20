@@ -17,36 +17,36 @@ numpyInputs = [
 
 numpyWeights = []
 
-def compute_weights(images):
+def compute_weights(fusion_images):
     (wc, ws, we) = (1, 1, 1)
     sigma = 0.2
     epsilon = 0.0000001
 
     weights = []
-    weights_sum = numpy.zeros(images[0].shape[:2], dtype=numpy.float32)
-    for image_uint in images:
-        image = numpy.float32(image_uint)
-        W = numpy.ones(image.shape[:2], dtype=numpy.float32)
+    weights_sum = numpy.zeros(fusion_images[0].shape[:2], dtype=numpy.float32)
+    for fusion_image in fusion_images:
+        fusion_image = numpy.float32(fusion_image)
+        imageWeights = numpy.ones(fusion_image.shape[:2], dtype=numpy.float32)
 
         # contrast
-        image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image_gray = cv2.cvtColor(fusion_image, cv2.COLOR_BGR2GRAY)
         laplacian = cv2.Laplacian(image_gray, cv2.CV_32F)
-        W_contrast = numpy.absolute(laplacian) ** wc
-        W = numpy.multiply(W, W_contrast)
+        contrast = numpy.power(numpy.absolute(laplacian),wc)
+        imageWeights = numpy.multiply(imageWeights, contrast)
 
         # saturation
-        W_saturation = image.std(axis=2, dtype=numpy.float32) ** ws
-        W = numpy.multiply(W, W_saturation)
+        saturation =numpy.power(fusion_image.std(axis=2, dtype=numpy.float32), ws)
+        imageWeights = numpy.multiply(imageWeights, saturation)
 
         # well-exposedness
-        sigma2 = sigma**2
-        W_exposedness = numpy.prod(numpy.exp(-((image - 0.5)**2)/(2*sigma2)), axis=2, dtype=numpy.float32) ** we
-        W = numpy.multiply(W, W_exposedness)
+        sigma2 = numpy.power(sigma,2)
+        exposedness = numpy.power(numpy.prod(numpy.exp(-(numpy.power((fusion_image - 0.5),2))/(2*sigma2)), axis=2, dtype=numpy.float32) , we)
+        imageWeights = numpy.multiply(imageWeights, exposedness)
 	
-        W = W + epsilon
-        weights_sum = numpy.add(W,weights_sum)
+        imageWeights = imageWeights + epsilon
+        weights_sum = numpy.add(imageWeights,weights_sum)
 
-        weights.append(W)
+        weights.append(imageWeights)
 
     # normalization
     for i in range(len(weights)):
